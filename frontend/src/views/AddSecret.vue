@@ -20,7 +20,7 @@ const handleSubmit = async (event) => {
     });
 
     const data = await response.json();
-  
+
     if (data.success) {
         Swal.fire({
             title: 'Secret created successfully!',
@@ -40,7 +40,9 @@ const handleSubmit = async (event) => {
 </script>
 
 <template>
-    <h2 class="p-3 text-3xl">You have new Secret?</h2>
+    <h2 class="p-3 text-3xl">
+        You have new Secret?
+    </h2>
     <div class="flex flex-col items-center justify-center">
         <form class="border border-gray-900  p-5 mt-5" @submit="handleSubmit">
             <h3 class="text-2xl font-bold mt-5 mb-5">Add New Secret</h3>
