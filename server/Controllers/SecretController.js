@@ -4,7 +4,7 @@ class SecretController {
     }
   
     async viewSecret(req, res) {
-      const hash = req.body.hash;
+      const hash = req.params.hash;
       const secret = await this.secretService.viewSecret(hash);
       if (secret) {
         res.status(200).send(secret);

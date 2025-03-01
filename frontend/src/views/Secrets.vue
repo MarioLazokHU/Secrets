@@ -10,29 +10,49 @@ onMounted(() => {
 });
 
 const getSecrets = async () => {
-    const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/secret-list`);
+    const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/secrets`);
     const data = await response.json();
     
     secrets.value = data;
 };
 
 const viewSecret = (secret) => {
+    const secretUrl = `${import.meta.env.VITE_API_BASE_URL}/secret/${secret.hash}`;
     Swal.fire({
         title: 'Do you want to view the secret?',
-        text: `Remain views ${secret.expiredAfterViews - secret.views}`,
+        html: `
+            <div>
+                <p>Remain views: ${secret.expiredAfterViews - secret.views}</p>
+                <button id="copy-url" class="bg-blue-600 cursor-pointer rounded shadow-sm p-1 text-white">Copy URL</button>
+            </div>`,
         icon: 'question',
         showCancelButton: true,
         confirmButtonText: 'Yes',
-        cancelButtonText: 'No'
+        cancelButtonText: 'No',
+        didOpen: () => {
+            const copyButton = Swal.getPopup().querySelector('#copy-url');
+            copyButton.addEventListener('click', () => {
+                navigator.clipboard.writeText(secretUrl).then(() => {
+                    Swal.fire({
+                        title: 'Copied!',
+                        text: 'The URL has been copied to your clipboard.',
+                        icon: 'success',
+                        timer: 2000,
+                        showConfirmButton: false,
+                        toast: true
+                    });
+                }).catch(err => {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: 'Failed to copy the URL.',
+                        icon: 'error'
+                    });
+                });
+            });
+        }
     }).then(async (result) => {
         if (result.isConfirmed) {
-            const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/secret-view`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ hash: secret.hash })
-            });
+            const response = await fetch(secretUrl);
             const data = await response.json();
 
             if (data.secret) {
@@ -51,7 +71,6 @@ const viewSecret = (secret) => {
             }
         }
     });
-
 };
 
 </script>
